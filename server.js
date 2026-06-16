@@ -812,8 +812,21 @@ app.post('/files', upload.single('file'), (req, res) => {
   const storedName = req.file?.filename || '';
   const mimeType = req.file?.mimetype || 'external/link';
   const size = req.file?.size || 0;
-  db.prepare(`INSERT INTO files (original_name, stored_name, mime_type, size_bytes, category, description, meeting_id, issue_id, external_url, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
-    .run(originalName, storedName, mimeType, size, req.body.category || '', req.body.description || '', req.body.meeting_id || null, req.body.issue_id || null, externalUrl, now());
+  let meetingId = req.body.meeting_id ? Number(req.body.meeting_id) : null;
+let issueId = req.body.issue_id ? Number(req.body.issue_id) : null;
+
+if (meetingId) {
+  const meetingExists = db.prepare('SELECT id FROM meetings WHERE id=?').get(meetingId);
+  if (!meetingExists) meetingId = null;
+}
+
+if (issueId) {
+  const issueExists = db.prepare('SELECT id FROM issues WHERE id=?').get(issueId);
+  if (!issueExists) issueId = null;
+}
+
+db.prepare(`INSERT INTO files (original_name, stored_name, mime_type, size_bytes, category, description, meeting_id, issue_id, external_url, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+  .run(originalName, storedName, mimeType, size, req.body.category || '', req.body.description || '', meetingId, issueId, externalUrl, now());
   res.redirect(req.headers.referer || '/files');
 });
 app.get('/files/:id/download', (req, res) => {
