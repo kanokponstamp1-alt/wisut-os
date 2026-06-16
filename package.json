@@ -1,0 +1,23 @@
+{
+  "name": "wisut-work-hub",
+  "version": "1.0.0",
+  "description": "ระบบหลังบ้านทีม สส. สำหรับจัดการประชุม งานค้าง ประเด็นงาน คอนเทนต์ หนังสือเข้าออก และไฟล์งาน",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^12.2.0",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
+    "nanoid": "^5.0.7",
+    "mammoth": "^1.8.0",
+    "pdf-parse": "^1.1.1"
+  }
+}
