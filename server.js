@@ -952,12 +952,12 @@ app.get('/contacts', (req, res) => {
         ${rows.length ? rows.map(c => `<tr>
           <td>
             <div style="display:flex;align-items:center;gap:12px;">
-              ${
-                c.photo_url
-                  ? `<img src="${e(c.photo_url)}" style="width:46px;height:46px;border-radius:50%;object-fit:cover;border:1px solid rgba(0,0,0,.08);" />`
-                  : `<div style="width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:#fff1e8;color:#ff6413;font-weight:800;border:1px solid rgba(255,100,19,.2);">👤</div>`
-              }
-              <div>
+  ${
+    c.photo_url
+      ? `<img src="${c.photo_url}" style="width:46px;height:46px;border-radius:50%;object-fit:cover;border:1px solid rgba(0,0,0,.08);" />`
+      : `<div style="width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:#fff1e8;color:#ff6413;font-weight:800;border:1px solid rgba(255,100,19,.2);">👤</div>`
+  }
+  <div>
                 <strong>${e(c.name)}</strong><br>
                 <small>${e(c.notes || '')}</small>
               </div>
