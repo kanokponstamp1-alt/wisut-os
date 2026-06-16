@@ -230,6 +230,8 @@ function initDb() {
   addColumnIfMissing('files', 'external_url', 'TEXT');
   addColumnIfMissing('content_items', 'canva_url', 'TEXT');
   addColumnIfMissing('content_items', 'google_doc_url', 'TEXT');
+  addColumnIfMissing('contacts', 'line_id', 'TEXT');
+  addColumnIfMissing('contacts', 'photo_url', 'TEXT');
 
   const userCount = db.prepare('SELECT COUNT(*) AS c FROM users').get().c;
   if (userCount === 0) {
@@ -918,6 +920,10 @@ function contactForm(c = {}) {
     <label>หน่วยงาน/องค์กร <input name="organization" value="${e(c.organization || '')}" /></label>
     <label>ตำแหน่ง <input name="position" value="${e(c.position || '')}" /></label>
     <label>โทรศัพท์ <input name="phone" value="${e(c.phone || '')}" /></label>
+    <label>LINE ID <input name="line_id" value="${e(c.line_id || '')}" /></label>
+    <label class="wide">ลิงก์รูปภาพ
+    <input name="photo_url" value="${e(c.photo_url || '')}" placeholder="https://..." />
+    </label>
     <label>อีเมล <input name="email" type="email" value="${e(c.email || '')}" /></label>
     <label class="wide">หมายเหตุ <textarea name="notes" rows="4">${e(c.notes || '')}</textarea></label>
     <div class="wide form-actions"><button class="primary" type="submit">บันทึก</button><a class="secondary" href="/contacts">ยกเลิก</a></div>
@@ -931,7 +937,17 @@ app.get('/contacts', (req, res) => {
 });
 app.get('/contacts/new', (req, res) => res.send(layout(req, { title: 'เพิ่มรายชื่อ', body: `<section class="panel">${contactForm()}</section>` })));
 app.post('/contacts', (req, res) => {
-  const fields = ['name','type','organization','position','phone','email','notes'];
+  const fields = [
+  'name',
+  'type',
+  'organization',
+  'position',
+  'phone',
+  'email',
+  'line_id',
+  'photo_url',
+  'notes'
+];
   db.prepare(`INSERT INTO contacts (${fields.join(',')}, created_at, updated_at) VALUES (${fields.map(() => '?').join(',')}, ?, ?)`).run(...fields.map(f => req.body[f] || ''), now(), now());
   res.redirect('/contacts');
 });
@@ -941,7 +957,17 @@ app.get('/contacts/:id/edit', (req, res) => {
   res.send(layout(req, { title: 'แก้ไขรายชื่อ', body: `<section class="panel">${contactForm(c)}</section>` }));
 });
 app.post('/contacts/:id/update', (req, res) => {
-  const fields = ['name','type','organization','position','phone','email','notes'];
+  const fields = [
+'name',
+'type',
+'organization',
+'position',
+'phone',
+'email',
+'line_id',
+'photo_url',
+'notes'
+];
   db.prepare(`UPDATE contacts SET ${fields.map(f => `${f}=?`).join(',')}, updated_at=? WHERE id=?`).run(...fields.map(f => req.body[f] || ''), now(), req.params.id);
   res.redirect('/contacts');
 });
