@@ -931,9 +931,53 @@ function contactForm(c = {}) {
 }
 app.get('/contacts', (req, res) => {
   const q = String(req.query.q || '').trim();
-  const rows = q ? db.prepare(`SELECT * FROM contacts WHERE name LIKE ? OR organization LIKE ? OR email LIKE ? ORDER BY id DESC`).all(`%${q}%`,`%${q}%`,`%${q}%`) : db.prepare('SELECT * FROM contacts ORDER BY id DESC').all();
-  const body = `${searchBox('/contacts', q)}<section class="panel"><table><thead><tr><th>ชื่อ</th><th>ประเภท</th><th>องค์กร/ตำแหน่ง</th><th>โทร</th><th>อีเมล</th><th></th></tr></thead><tbody>${rows.length ? rows.map(c => `<tr><td><strong>${e(c.name)}</strong><br><small>${e(c.notes || '')}</small></td><td>${e(c.type || '-')}</td><td>${e(c.organization || '-')}<br><small>${e(c.position || '')}</small></td><td>${e(c.phone || '-')}</td><td>${e(c.email || '-')}</td><td><a class="small-btn" href="/contacts/${c.id}/edit">แก้ไข</a></td></tr>`).join('') : `<tr><td colspan="6" class="empty">ยังไม่มีรายชื่อ</td></tr>`}</tbody></table></section>`;
-  res.send(layout(req, { title: 'รายชื่อ', body, actions: `<a class="primary" href="/contacts/new">+ เพิ่มรายชื่อ</a>` }));
+  const rows = q
+    ? db.prepare(`SELECT * FROM contacts WHERE name LIKE ? OR organization LIKE ? OR email LIKE ? OR line_id LIKE ? ORDER BY id DESC`).all(`%${q}%`,`%${q}%`,`%${q}%`,`%${q}%`)
+    : db.prepare('SELECT * FROM contacts ORDER BY id DESC').all();
+
+  const body = `${searchBox('/contacts', q)}
+  <section class="panel">
+    <table>
+      <thead>
+        <tr>
+          <th>ชื่อ</th>
+          <th>ประเภท</th>
+          <th>องค์กร/ตำแหน่ง</th>
+          <th>โทร/LINE</th>
+          <th>อีเมล</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.length ? rows.map(c => `<tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:12px;">
+              ${
+                c.photo_url
+                  ? `<img src="${e(c.photo_url)}" style="width:46px;height:46px;border-radius:50%;object-fit:cover;border:1px solid rgba(0,0,0,.08);" />`
+                  : `<div style="width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:#fff1e8;color:#ff6413;font-weight:800;border:1px solid rgba(255,100,19,.2);">👤</div>`
+              }
+              <div>
+                <strong>${e(c.name)}</strong><br>
+                <small>${e(c.notes || '')}</small>
+              </div>
+            </div>
+          </td>
+          <td>${e(c.type || '-')}</td>
+          <td>${e(c.organization || '-')}<br><small>${e(c.position || '')}</small></td>
+          <td>${e(c.phone || '-')}<br><small>${e(c.line_id ? `LINE: ${c.line_id}` : '')}</small></td>
+          <td>${e(c.email || '-')}</td>
+          <td><a class="small-btn" href="/contacts/${c.id}/edit">แก้ไข</a></td>
+        </tr>`).join('') : `<tr><td colspan="6" class="empty">ยังไม่มีรายชื่อ</td></tr>`}
+      </tbody>
+    </table>
+  </section>`;
+
+  res.send(layout(req, {
+    title: 'รายชื่อ',
+    body,
+    actions: `<a class="primary" href="/contacts/new">+ เพิ่มรายชื่อ</a>`
+  }));
 });
 app.get('/contacts/new', (req, res) => res.send(layout(req, { title: 'เพิ่มรายชื่อ', body: `<section class="panel">${contactForm()}</section>` })));
 app.post('/contacts', (req, res) => {
