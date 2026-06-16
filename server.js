@@ -388,7 +388,7 @@ function option(value, label, selected) {
 }
 
 function getMeetings() {
-  return db.prepare('SELECT id, title, meeting_date FROM meetings ORDER BY COALESCE(meeting_date, '9999-12-31') DESC, id DESC').all();
+  return db.prepare("SELECT id, title, meeting_date FROM meetings ORDER BY COALESCE(meeting_date, '9999-12-31') DESC, id DESC").all();
 }
 
 function getIssues() {
